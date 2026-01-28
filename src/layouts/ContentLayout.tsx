@@ -1,27 +1,27 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import SideMenu from './components/SideMenu';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
 export default function ContentLayout() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="min-h-dvh w-full bg-slate-50 text-slate-900">
-      <div className="flex min-h-dvh w-full">
-        {/* 왼쪽 사이드바 */}
-        <aside className="w-80 shrink-0 border-r border-slate-200 bg-white">
-          <SideMenu />
-        </aside>
+    <div className="min-h-screen w-full bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-200 transition-colors duration-300 flex flex-col">
+      {/* Header */}
+      <Header onMenuClick={() => setIsMenuOpen(true)} />
 
-        {/* 오른쪽 본문 */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          <Header />
+      {/* Sidebar (Drawer) */}
+      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
-          <main className="min-w-0 bg-slate-50 flex-1 p-6">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-      </div>
+      {/* Main Content */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Outlet />
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

@@ -35,7 +35,7 @@ export default function LoginPage() {
       sessionStorage.setItem('accessToken', data.accessToken);
 
       // ✅ 로그인 성공 후 이동
-      navigate('/admin', { replace: true });
+      navigate('/', { replace: true });
     } catch (e: any) {
       // ✅ 너 axios.ts가 ApiError로 표준화해서 reject 하니까 보통 e.message에 메시지가 들어옴
       setErrorMsg(e?.message ?? '로그인 실패');

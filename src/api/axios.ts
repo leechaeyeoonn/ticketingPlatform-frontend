@@ -87,6 +87,19 @@ http.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // ✅ 1.5) userId: 1 강제 주입 (API 정의서 요구사항)
+    // GET 요청이면 params에, 그 외(POST 등)면 data에 userId=1을 추가합니다.
+    if (config.method?.toLowerCase() === 'get') {
+      config.params = { userId: 1, ...config.params };
+    } else if (
+      config.data &&
+      typeof config.data === 'object' &&
+      !(config.data instanceof FormData)
+    ) {
+      // FormData가 아닌 일반 JSON 객체인 경우에만 병합
+      config.data = { userId: 1, ...config.data };
+    }
+
     // 2) Content-Type: JSON 기본값
     // - GET은 Content-Type 굳이 안 넣음
     // - FormData는 axios가 boundary 포함해서 자동 세팅하도록 건드리지 않음

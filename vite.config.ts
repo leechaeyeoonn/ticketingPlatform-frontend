@@ -1,40 +1,14 @@
-import path from 'path';
-
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react-swc';
-import { defineConfig, loadEnv, type ConfigEnv, type UserConfig } from 'vite';
+import path from 'path'; // 1. path 모듈 가져오기
 
-export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
-  const env = loadEnv(mode, process.cwd(), '');
-  process.env = { ...process.env, ...env };
-
- // const apiContext = env.VITE_API_CONTEXT || 'api';
-
-  return {
-    plugins: [react(), tailwindcss()],
-    resolve: {
-      alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'), // 2. @를 src 폴더로 연결
     },
-    css: {
-      preprocessorOptions: {
-        scss: { },
-      },
-    },
-    server: {
-      port: 3000,
-      // 백엔드 붙일 때만 사용
-      // proxy: {
-      //   '/api': {
-      //     target: env.VITE_API_TARGET,
-      //     rewrite: (p) => p.replace(/^\/api/, `/${apiContext}`),
-      //     changeOrigin: true,
-      //   },
-      // },
-    },
-    build: {
-      sourcemap: true,
-      target: 'esnext',
-      chunkSizeWarningLimit: 500,
-    },
-  };
+  },
 });
