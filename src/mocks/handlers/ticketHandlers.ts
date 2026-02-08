@@ -8,14 +8,14 @@ export const ticketHandlers = [
         id: 1,
         title: '2026 싸이 흠뻑쇼',
         type: 'CONCERT',
-        thumbnail: 'https://via.placeholder.com/300x400',
+        thumbnail: 'https://cdn.pixabay.com/photo/2017/07/21/23/57/concert-2527495_1280.jpg', // 임시 이미지
         description: '여름의 상징, 싸이의 열정적인 무대!',
       },
       {
         id: 2,
         title: 'K리그 슈퍼매치',
         type: 'SPORTS',
-        thumbnail: 'https://via.placeholder.com/300x400',
+        thumbnail: 'https://cdn.pixabay.com/photo/2016/11/29/02/05/audience-1866738_1280.jpg',
         description: '전통의 라이벌전, 승자는 누구인가?',
       },
     ]);

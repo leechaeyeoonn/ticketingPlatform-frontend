@@ -1,147 +1,127 @@
-// src/pages/LoginPage.tsx
+// src/pages/Auth/LoginPage.tsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { http } from '@/api/axios'; // ✅ 너 프로젝트의 axios 인스턴스 (res.data만 반환하도록 인터셉터 되어있음)
-
-type LoginResponse = {
-  accessToken: string;
-  expiresIn: number;
-  user: { id: number; name: string; email: string };
-};
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '@/api/auth'; 
+import AuthModalManager from '@/components/auth/AuthModalManager';
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  // ✅ 입력값 state
-  const [email, setEmail] = useState('test@nflux.com');
-  const [password, setPassword] = useState('1234');
+  // 🚨 [여기가 범인이었습니다!] 이 줄이 없어서 에러가 난 겁니다.
+  const [modalType, setModalType] = useState<'FIND_PW' | 'SIGNUP' | null>(null);
 
-  // ✅ UI 상태
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  // 로그인 폼 상태
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onLogin = async () => {
-    setErrorMsg('');
-    setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
-      // ✅ baseURL이 /api 라면 여기 url은 /api 붙이면 안 됨 (중복되어 /api/api/... 될 수 있음)
-      const data = await http.post<LoginResponse, LoginResponse>('/auth/login', {
-        email,
-        password,
-      });
+      // API 요청
+      const response = await login({ email, password });
+      
+      console.log('서버 응답:', response); // 디버깅용 로그
 
-      // ✅ axios.ts에서 getAccessToken()이 sessionStorage 'accessToken' 읽으니까 키 동일하게 저장
-      sessionStorage.setItem('accessToken', data.accessToken);
+      // 토큰 꺼내기 (구조에 따라 유연하게 대처)
+      const token = (response as any).accessToken || (response as any).data?.accessToken;
+      const user = (response as any).user || (response as any).data?.user;
 
-      // ✅ 로그인 성공 후 이동
-      navigate('/', { replace: true });
-    } catch (e: any) {
-      // ✅ 너 axios.ts가 ApiError로 표준화해서 reject 하니까 보통 e.message에 메시지가 들어옴
-      setErrorMsg(e?.message ?? '로그인 실패');
+      if (!token) throw new Error('토큰을 찾을 수 없습니다.');
+      
+      sessionStorage.setItem('accessToken', token);
+      if (user) sessionStorage.setItem('user', JSON.stringify(user));
+
+      console.log('✅ 로그인 성공! 메인으로 이동');
+      navigate('/');
+
+    } catch (err: any) {
+      console.error('❌ 로그인 에러:', err);
+      // 404 에러가 뜨면 여기서 잡힘
+      setError('서버 연결에 실패했습니다. (API 주소를 확인해주세요)');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
-      <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
-        <h1 className="font-bold text-center text-2xl mb-5">Shopping App</h1>
+    <div className="min-h-screen flex items-center justify-center bg-stone-950 px-4">
+      <div className="max-w-md w-full space-y-8">
+        
+        {/* 헤더 */}
+        <div className="text-center">
+          <Link to="/" className="inline-block">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-indigo-500 to-violet-600 bg-clip-text text-transparent">
+              Toy Ticket
+            </h1>
+          </Link>
+          <h2 className="mt-6 text-3xl font-bold text-white">로그인</h2>
+        </div>
 
-        <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-          <div className="px-5 py-7">
-            <label className="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
-              placeholder="test@nflux.com"
-              autoComplete="email"
-            />
+        {/* 폼 */}
+        <div className="bg-stone-900 py-8 px-6 shadow-2xl rounded-2xl border border-stone-800 sm:px-10">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-stone-300">이메일</label>
+              <input
+                id="email" type="email" required value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full px-3 py-3 border border-stone-700 rounded-lg bg-stone-950 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="test@nflux.com" 
+              />
+            </div>
 
-            <label className="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border rounded-lg px-3 py-2 mt-1 mb-3 text-sm w-full"
-              placeholder="1234"
-              autoComplete="current-password"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') onLogin();
-              }}
-            />
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-stone-300">비밀번호</label>
+              <input
+                id="password" type="password" required value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full px-3 py-3 border border-stone-700 rounded-lg bg-stone-950 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="1234" 
+              />
+            </div>
 
-            {/* ✅ 에러 메시지 */}
-            {errorMsg && (
-              <div className="mb-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-                {errorMsg}
+            {error && (
+              <div className="text-red-400 text-sm text-center bg-red-900/20 py-2 rounded-lg border border-red-900/50">
+                {error}
               </div>
             )}
 
             <button
-              type="button"
-              onClick={onLogin}
-              disabled={loading}
-              className="transition duration-200 bg-blue-500 hover:bg-blue-600
-                         focus:bg-blue-700 focus:shadow-sm focus:ring-4
-                         focus:ring-blue-500 focus:ring-opacity-50 text-white
-                         w-full py-2.5 rounded-lg text-sm shadow-sm
-                         hover:shadow-md font-semibold text-center inline-block mb-2
-                         disabled:opacity-60 disabled:cursor-not-allowed"
+              type="submit" disabled={isLoading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 transition-all disabled:opacity-50"
             >
-              <span className="inline-block mr-2">{loading ? 'Logging in...' : 'Login'}</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-4 h-4 inline-block"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
+              {isLoading ? '로그인 중...' : '로그인'}
             </button>
+          </form>
 
-            <button
-              type="button"
-              onClick={() => navigate('/signup', { replace: true })}
-              className="transition duration-200 bg-blue-500 hover:bg-blue-600
-                         focus:bg-blue-700 focus:shadow-sm focus:ring-4
-                         focus:ring-blue-500 focus:ring-opacity-50 text-white
-                         w-full py-2.5 rounded-lg text-sm shadow-sm
-                         hover:shadow-md font-semibold text-center inline-block"
+          {/* 모달 버튼들 */}
+          <div className="mt-6 flex items-center justify-between text-sm">
+            <button 
+              onClick={() => setModalType('FIND_PW')} // 이제 modalType이 있어서 에러 안 남!
+              className="font-medium text-stone-500 hover:text-stone-300"
             >
-              <span className="inline-block mr-2">Sign up</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="w-4 h-4 inline-block"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
+              비밀번호 찾기
             </button>
-
-            {/* ✅ 실습 안내(원하면 제거) */}
-            <p className="mt-3 text-xs text-gray-500">
-              테스트 계정: <b>test@nflux.com</b> / <b>1234</b>
-            </p>
+            <button 
+              onClick={() => setModalType('SIGNUP')}
+              className="font-medium text-indigo-400 hover:text-indigo-300"
+            >
+              회원가입
+            </button>
           </div>
         </div>
       </div>
+
+      {/* 모달 매니저 */}
+      <AuthModalManager 
+        modalType={modalType} 
+        onClose={() => setModalType(null)} 
+      />
     </div>
   );
 }

@@ -13,9 +13,12 @@ export type LoginResponse = {
 };
 
 export async function login(body: LoginBody) {
-  // ✅ http가 이미 res.data를 반환하므로 res가 곧 LoginResponse
-  const data = await http.post<LoginResponse>('/auth/login', body);
-  return data;
+  // 1. 요청 보내기
+  const response = await http.post<LoginResponse>('/auth/login', body);
+  
+  // 2. ⭐ 중요: .data를 붙이지 말고 그대로 반환하세요!
+  // TypeScript 에러 방지를 위해 'as LoginResponse'로 강제 지정합니다.
+  return response as unknown as LoginResponse;
 }
 
 export type MeResponse = {
@@ -23,14 +26,12 @@ export type MeResponse = {
 };
 
 export async function me() {
-  // ✅ 마찬가지로 data가 곧 MeResponse
-  const data = await http.get<MeResponse>('/auth/me');
-  return data;
+  const response = await http.get<MeResponse>('/auth/me');
+  return response as unknown as MeResponse;
 }
 
 export type LogoutResponse = { ok: true };
 
 export function logout() {
-  // MSW에 /auth/logout 핸들러가 없다면 404/미스매치 날 수 있음
   return http.post<LogoutResponse>('/auth/logout');
 }
