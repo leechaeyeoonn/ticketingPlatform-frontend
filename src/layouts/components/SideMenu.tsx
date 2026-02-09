@@ -49,14 +49,14 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
             className="flex items-center gap-3 px-4 py-3 text-stone-700 dark:text-stone-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 rounded-xl transition-colors"
           >
             <CreditCard className="w-5 h-5" />
-            <span className="font-medium">결제 내역</span>
+            <span className="font-medium">결제 수단 관리</span>
           </Link>
           <div className="pt-4 mt-4 border-t border-stone-200 dark:border-stone-800">
             <p className="px-4 text-sm font-semibold text-stone-400 uppercase tracking-wider mb-2">
               My Account
             </p>
             <Link
-              to="#"
+              to="/mypage"
               className="flex items-center gap-3 px-4 py-3 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
             >
               <Ticket className="w-5 h-5" />

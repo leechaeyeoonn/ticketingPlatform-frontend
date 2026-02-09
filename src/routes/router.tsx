@@ -8,6 +8,8 @@ import PerformanceDetailPage from '../pages/Detail/PerformanceDetailPage';
 import SeatSelectionPage from '../pages/Reservation/SeatSelectionPage';
 import PaymentPage from '../pages/Payment/PaymentPage';
 import LoginPage from '../pages/auth/LoginPage'; // 👈 로그인 페이지 import 확인!
+import MyTicketPage from '../pages/Mypage/MyTicketPage'; 
+import PaymentMethodPage from '../pages/Mypage/PaymentMethodPage'; // 👈 로그인 페이지 import 확인!
 
 // ✅ 로그인한 사람이 /login 들어오면 메인으로 튕겨내는 로직 (기존 코드 활용)
 // (sessionStorage에 토큰이 있으면 로그인된 것으로 간주)
@@ -53,9 +55,14 @@ export const router = createBrowserRouter([
             path: 'reservation/:scheduleId',
             element: <SeatSelectionPage />,
           },
+          // ... children 배열 안에 ...
           {
-            path: 'payment',
-            element: <PaymentPage />,
+            path: 'mypage', // http://localhost:5173/mypage
+            element: <MyTicketPage />,
+          },
+          {
+            path: 'payment', // 주소: http://localhost:5173/payment
+            element: <PaymentMethodPage />,
           },
         ],
       },

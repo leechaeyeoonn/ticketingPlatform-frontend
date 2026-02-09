@@ -1,10 +1,41 @@
 import client from './client';
-import type { Performance } from '../types/ticket'; // 타입은 나중에 채워도 돼요 (일단 any로 하셔도 무방)
+
+// 👇 타입을 분리된 파일에서 가져옵니다!
+import type { 
+  Performance, 
+  Schedule, 
+  Seat, 
+  ReservationResponse, 
+  ReservationRequest 
+} from '../types/ticket';
 
 // [U-01] 공연 목록 조회
-// 우리가 코드는 이렇게 짜지만, 실제로는 MSW가 이 요청을 가로채서 가짜 데이터를 줍니다.
-export const getPerformances = () => client.get('/api/performances');
+export const getPerformances = async () => {
+  const response = await client.get<Performance[]>('/api/performances');
+  return response;
+};
 
-// [U-04] 좌석 선점
-export const reserveSeat = (scheduleId: number, seatId: number) =>
-  client.post('/api/reservations', { scheduleId, seatId });
+// [U-02] 공연 상세 조회
+export const getPerformanceDetail = async (id: string) => {
+  const response = await client.get<Performance>(`/api/performances/${id}`);
+  return response;
+};
+
+// [NEW] 스케줄 조회
+export const getSchedules = async (performanceId: string) => {
+  const response = await client.get<Schedule[]>(`/api/performances/${performanceId}/schedules`);
+  return response.data;
+};
+
+// [U-03] 좌석 조회
+export const getSeats = async (scheduleId: number) => {
+  const response = await client.get<Seat[]>(`/api/schedules/${scheduleId}/seats`);
+  return response.data;
+};
+
+// [U-04] 좌석 선점 (예매)
+export const reserveSeat = async (userId: number, seatId: number) => {
+  const body: ReservationRequest = { userId, seatId };
+  const response = await client.post<ReservationResponse>('/api/reservations', body);
+  return response.data;
+};

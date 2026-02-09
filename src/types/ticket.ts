@@ -1,35 +1,52 @@
-// 1. 공연 타입 정의 (콘서트 vs 스포츠)
+// src/types/ticket.ts
+
+// 1. 공연 타입
 export type PerformanceType = 'CONCERT' | 'SPORTS';
 
-// 2. 공연 (Performance) 인터페이스
+// 2. 공연 (Performance)
 // API: GET /api/performances
 export interface Performance {
   id: number;
   title: string;
   type: PerformanceType;
-  thumbnail: string; // U-01: 썸네일 노출
-  description: string; // U-02: 설명 노출
-  location: string; // U-02: 장소 노출
-  // 상세 조회 시 회차 정보가 포함될 수 있음 (선택적)
-  schedules?: Schedule[];
+  thumbnail: string;
+  description: string;
+  price: number; // 최저가 정보 등
+  location?: string; // (선택) 장소
 }
 
-// 3. 회차 (Schedule) 인터페이스
-// 공연의 구체적인 날짜와 시간
+// 3. 스케줄 (Schedule)
+// API: GET /api/performances/{id}/schedules
 export interface Schedule {
   id: number;
-  performanceId: number;
-  startTime: string; // ISO 8601 형식 (예: "2026-08-15T18:00:00")
+  date: string; // "2026-08-15"
+  time: string; // "18:00"
+  round: number; // 회차 (예: 1회차)
+  availableSeats?: number; // (선택) 잔여 좌석 수
 }
 
-// 4. 좌석 (Seat) 인터페이스
+// 4. 좌석 (Seat)
 // API: GET /api/schedules/{id}/seats
 export interface Seat {
-  id: number;
-  scheduleId: number;
-  seatNumber: string; // 예: "A-1", "VIP-3"
-  isAvailable: boolean; // U-03: 예약 가능 여부 (true: 가능, false: 선점/판매됨)
-  price: number; // 가격 정보 (화면에 표시하기 위해 추가)
+  id: number;        // seatId (예약 요청 시 필요)
+  seatNumber: string; // "1-1", "A-1" 등
+  grade: string;      // "VIP", "R"
+  price: number;
+  
+  // 🚨 [중요 수정] 백엔드 명세서는 'isReserved'를 씁니다.
+  // true = 예약됨(선택불가), false = 예약가능(선택가능)
+  isReserved: boolean; 
 }
 
-// 5. 예매 요청 (Reservation Request) 인터페이스
+// 5. 예매 요청/응답 (Reservation)
+// API: POST /api/reservations
+export interface ReservationRequest {
+  userId: number;
+  seatId: number;
+}
+
+export interface ReservationResponse {
+  reservationId: number;
+  status: string;
+  message: string;
+}
