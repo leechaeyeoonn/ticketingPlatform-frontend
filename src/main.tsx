@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router-dom';
 import './index.css';
 import { router } from './routes/router';
 import { ThemeProvider } from './context/ThemeContext';
+import Toast from '@/components/common/Toast';
 
 async function enableMocking() {
   // 개발환경에서만 MSW 켜기
@@ -24,6 +25,7 @@ enableMocking()
     ReactDOM.createRoot(document.getElementById('root')!).render(
       <React.StrictMode>
         <ThemeProvider>
+          <Toast />
           <RouterProvider router={router} />
         </ThemeProvider>
       </React.StrictMode>,

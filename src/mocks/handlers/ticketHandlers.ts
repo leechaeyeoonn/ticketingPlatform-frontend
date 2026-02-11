@@ -1,27 +1,8 @@
 import { http, HttpResponse } from 'msw';
+import { PERFORMANCES_DATA } from '../data/performanceDummyData';
 
 // ✅ 백엔드 서버 주소 (명세서 기준)
 const BASE_URL = 'http://localhost:8080/api';
-
-// 1. 유저 데이터 유지 (싸이 흠뻑쇼 & K리그)
-const PERFORMANCES = [
-  {
-    id: 1,
-    title: '2026 싸이 흠뻑쇼',
-    type: 'CONCERT',
-    thumbnail: 'https://cdn.pixabay.com/photo/2017/07/21/23/57/concert-2527495_1280.jpg',
-    description: '여름의 상징, 싸이의 열정적인 무대!',
-    price: 150000,
-  },
-  {
-    id: 2,
-    title: 'K리그 슈퍼매치',
-    type: 'SPORTS',
-    thumbnail: 'https://cdn.pixabay.com/photo/2016/11/29/02/05/audience-1866738_1280.jpg',
-    description: '전통의 라이벌전, 승자는 누구인가?',
-    price: 40000,
-  },
-];
 
 export const ticketHandlers = [
   // ----------------------------------------------------------------
@@ -29,7 +10,7 @@ export const ticketHandlers = [
   // GET /api/performances
   // ----------------------------------------------------------------
   http.get(`${BASE_URL}/performances`, () => {
-    return HttpResponse.json(PERFORMANCES);
+    return HttpResponse.json(PERFORMANCES_DATA);
   }),
 
   // ----------------------------------------------------------------
@@ -38,7 +19,7 @@ export const ticketHandlers = [
   // ----------------------------------------------------------------
   http.get(`${BASE_URL}/performances/:id`, ({ params }) => {
     const { id } = params;
-    const target = PERFORMANCES.find((p) => p.id === Number(id));
+    const target = PERFORMANCES_DATA.find((p) => p.id === Number(id));
 
     if (!target) return new HttpResponse(null, { status: 404 });
     return HttpResponse.json(target);
@@ -50,19 +31,19 @@ export const ticketHandlers = [
   // ----------------------------------------------------------------
   http.get(`${BASE_URL}/performances/:id/schedules`, ({ params }) => {
     console.log(`MSW: 공연 ${params.id}번의 스케줄 조회`);
-    
+
     const { id } = params;
 
     // 싸이 흠뻑쇼(1)인 경우와 K리그(2)인 경우 스케줄 다르게 주기
     if (id === '1') {
-        return HttpResponse.json([
-            { id: 101, date: '2026-08-15', time: '18:00', round: 1 }, // 광복절 흠뻑쇼
-            { id: 102, date: '2026-08-16', time: '18:00', round: 2 },
-        ]);
+      return HttpResponse.json([
+        { id: 101, date: '2026-08-15', time: '18:00', round: 1 }, // 광복절 흠뻑쇼
+        { id: 102, date: '2026-08-16', time: '18:00', round: 2 },
+      ]);
     } else {
-        return HttpResponse.json([
-            { id: 201, date: '2026-08-20', time: '19:30', round: 1 }, // 평일 저녁 축구
-        ]);
+      return HttpResponse.json([
+        { id: 201, date: '2026-08-20', time: '19:30', round: 1 }, // 평일 저녁 축구
+      ]);
     }
   }),
 
@@ -77,16 +58,16 @@ export const ticketHandlers = [
     return HttpResponse.json(
       Array.from({ length: 20 }, (_, i) => {
         // 30% 확률로 이미 예약된(isReserved: true) 좌석 생성
-        const isReserved = Math.random() < 0.3; 
-        
+        const isReserved = Math.random() < 0.3;
+
         return {
           id: i + 1, // seatId
           seatNumber: `${Math.floor(i / 5) + 1}-${(i % 5) + 1}`, // 1-1, 1-2 형식 유지
           price: 150000, // 가격 추가
-          grade: 'VIP',  // 등급 추가
+          grade: 'VIP', // 등급 추가
           isReserved: isReserved, // 🚨 [중요] 명세서 기준: true면 예약 불가
         };
-      })
+      }),
     );
   }),
 
@@ -95,11 +76,11 @@ export const ticketHandlers = [
   // POST /api/reservations
   // ----------------------------------------------------------------
   http.post(`${BASE_URL}/reservations`, async () => {
-  return HttpResponse.json({ 
-    // 👇 이 필드들이 React 코드랑 똑같아야 합니다!
-    status: 'SUCCESS',       // React가 response.status 체크함
-    reservationId: 12345,    // React가 response.reservationId 출력함
-    message: '예매 성공!' 
-  });
-}),
+    return HttpResponse.json({
+      // 👇 이 필드들이 React 코드랑 똑같아야 합니다!
+      status: 'SUCCESS', // React가 response.status 체크함
+      reservationId: 12345, // React가 response.reservationId 출력함
+      message: '예매 성공!',
+    });
+  }),
 ];
