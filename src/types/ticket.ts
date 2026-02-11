@@ -1,7 +1,13 @@
 // src/types/ticket.ts
 
 // 1. 공연 타입
-export type PerformanceType = 'CONCERT' | 'SPORTS';
+export type PerformanceType =
+  | 'CONCERT'
+  | 'SPORTS'
+  | 'MUSICAL'
+  | 'EXHIBITION'
+  | 'CLASSIC'
+  | 'FAMILY';
 
 // 2. 공연 (Performance)
 // API: GET /api/performances
@@ -28,14 +34,14 @@ export interface Schedule {
 // 4. 좌석 (Seat)
 // API: GET /api/schedules/{id}/seats
 export interface Seat {
-  id: number;        // seatId (예약 요청 시 필요)
+  id: number; // seatId (예약 요청 시 필요)
   seatNumber: string; // "1-1", "A-1" 등
-  grade: string;      // "VIP", "R"
+  grade: string; // "VIP", "R"
   price: number;
-  
+
   // 🚨 [중요 수정] 백엔드 명세서는 'isReserved'를 씁니다.
   // true = 예약됨(선택불가), false = 예약가능(선택가능)
-  isReserved: boolean; 
+  isReserved: boolean;
 }
 
 // 5. 예매 요청/응답 (Reservation)
