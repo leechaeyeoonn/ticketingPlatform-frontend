@@ -10,6 +10,9 @@ const TEST_USER = {
   id: 1,
   name: 'Test User',
   email: 'test@nflux.com',
+  nickname: 'developer',
+  grade: 'GOLD',
+  point: 5000,
 };
 
 function getBearerToken(authHeader: string | null) {

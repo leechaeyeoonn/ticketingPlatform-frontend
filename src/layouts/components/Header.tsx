@@ -3,6 +3,7 @@ import { useTheme } from '@/context/ThemeContext';
 import { Menu, Search, User, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
 import AuthModalManager from '@/components/auth/AuthModalManager';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -16,12 +17,11 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const [modalType, setModalType] = useState<'PROFILE' | null>(null);
 
   // ✅ 2. 로그인 정보 확인
-  const isLoggedIn = !!sessionStorage.getItem('accessToken');
-  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  const { user, isAuthenticated } = useAuthStore();
 
   // ✅ 3. 유저 아이콘 클릭 핸들러
   const handleUserClick = () => {
-    if (isLoggedIn) {
+    if (isAuthenticated) {
       // 로그인 상태면 -> 프로필 모달 열기
       setModalType('PROFILE');
     } else {
@@ -69,7 +69,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 className="p-2 text-stone-500 hover:text-stone-700 dark:text-stone-400 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full transition-colors flex items-center justify-center"
                 aria-label="User Profile"
               >
-                {isLoggedIn ? (
+                {isAuthenticated && user ? (
                   // 로그인 했을 때: 그라데이션 테두리가 있는 이니셜 아바타
                   <div className="w-6 h-6 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 p-[1.5px]">
                     <div className="w-full h-full rounded-full bg-stone-50 dark:bg-stone-950 flex items-center justify-center">

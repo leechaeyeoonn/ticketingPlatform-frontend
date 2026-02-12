@@ -4,23 +4,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Trash2, Ticket } from 'lucide-react'; // 아이콘 (설치 안됐으면 글자로 대체됨)
 import Modal from '@/components/common/Modal';
 import { useToast } from '@/hooks/useToast';
-
-interface TicketData {
-  reservationId: number;
-  title: string;
-  date: string;
-  time: string;
-  seat: string;
-  grade: string;
-  price: number;
-  poster: string;
-}
+import { useMyTicketStore } from '@/store/useMyTicketStore';
 
 export default function MyTicketPage() {
   const navigate = useNavigate();
   const location = useLocation(); // ✅ 전달받은 state 확인용
-  const [tickets, setTickets] = useState<TicketData[]>([]);
   const { showToast } = useToast();
+
+  // ✅ Zustand Store 사용
+  const { myTickets, loadMyData, cancelReservation } = useMyTicketStore();
 
   // 모달 상태 관리
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -36,13 +28,10 @@ export default function MyTicketPage() {
     }
   }, [location, showToast, navigate]);
 
-  // 1. 화면 켜지면 localStorage에서 데이터 꺼내오기
+  // 1. 화면 켜지면 Store에서 데이터 로드
   useEffect(() => {
-    const saved = localStorage.getItem('myTickets');
-    if (saved) {
-      setTickets(JSON.parse(saved));
-    }
-  }, []);
+    loadMyData();
+  }, [loadMyData]);
 
   // 2. 예매 취소 버튼 클릭 (모달 열기)
   const handleCancelClick = (targetId: number) => {
@@ -54,9 +43,8 @@ export default function MyTicketPage() {
   const handleConfirmCancel = () => {
     if (selectedTicketId === null) return;
 
-    const updatedTickets = tickets.filter((t) => t.reservationId !== selectedTicketId);
-    setTickets(updatedTickets);
-    localStorage.setItem('myTickets', JSON.stringify(updatedTickets));
+    // ✅ Store 액션 호출
+    cancelReservation(selectedTicketId);
 
     setIsCancelModalOpen(false);
     showToast('예매가 취소되었습니다.', 'info');
@@ -69,7 +57,7 @@ export default function MyTicketPage() {
           <Ticket className="text-indigo-500" />내 예매 내역
         </h1>
 
-        {tickets.length === 0 ? (
+        {myTickets.length === 0 ? (
           <div className="text-center py-20 bg-stone-900 rounded-2xl border border-stone-800">
             <p className="text-stone-500 text-lg mb-4">예매한 내역이 없습니다.</p>
             <button
@@ -81,7 +69,7 @@ export default function MyTicketPage() {
           </div>
         ) : (
           <div className="grid gap-6">
-            {tickets.map((ticket) => (
+            {myTickets.map((ticket) => (
               <div
                 key={ticket.reservationId}
                 className="bg-stone-900 rounded-2xl border border-stone-800 p-6 flex flex-col md:flex-row gap-6 hover:border-indigo-500/50 transition-all shadow-lg"

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { X, Home, CreditCard, Ticket, Settings } from 'lucide-react';
+import { X, Home, CreditCard, Ticket, Settings, ShoppingCart } from 'lucide-react';
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -42,6 +42,14 @@ export default function SideMenu({ isOpen, onClose }: SideMenuProps) {
           >
             <Home className="w-5 h-5" />
             <span className="font-medium">홈</span>
+          </Link>
+          <Link
+            to="/market"
+            onClick={onClose}
+            className="flex items-center gap-3 px-4 py-3 text-stone-700 dark:text-stone-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 hover:text-violet-600 dark:hover:text-violet-400 rounded-xl transition-colors"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            <span className="font-medium">티켓 마켓</span>
           </Link>
           <Link
             to="/payment"

@@ -6,16 +6,17 @@ import ContentLayout from '../layouts/ContentLayout'; // 👈 헤더/푸터 레�
 import MainPage from '../pages/Main/MainPage';
 import PerformanceDetailPage from '../pages/Detail/PerformanceDetailPage';
 import SeatSelectionPage from '../pages/Reservation/SeatSelectionPage';
-import PaymentPage from '../pages/Payment/PaymentPage';
-import LoginPage from '../pages/auth/LoginPage'; // 👈 로그인 페이지 import 확인!
-import MyTicketPage from '../pages/Mypage/MyTicketPage'; 
+import LoginPage from '../pages/Auth/LoginPage'; // 👈 로그인 페이지 import 확인!
+import MyTicketPage from '../pages/Mypage/MyTicketPage';
 import PaymentMethodPage from '../pages/Mypage/PaymentMethodPage'; // 👈 로그인 페이지 import 확인!
+import MarketPage from '@/pages/Market/MarketPage'; // 👈 import 추가
+import { useAuthStore } from '@/store/useAuthStore';
 
 // ✅ 로그인한 사람이 /login 들어오면 메인으로 튕겨내는 로직 (기존 코드 활용)
 // (sessionStorage에 토큰이 있으면 로그인된 것으로 간주)
 function PublicOnlyRoute() {
-  const token = sessionStorage.getItem('accessToken');
-  if (token) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
   return <Outlet />;
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
           {
             path: 'payment', // 주소: http://localhost:5173/payment
             element: <PaymentMethodPage />,
+          },
+          {
+            path: 'market', // 주소: http://localhost:5173/payment
+            element: <MarketPage />,
           },
         ],
       },

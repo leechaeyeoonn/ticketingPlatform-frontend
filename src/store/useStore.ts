@@ -7,7 +7,7 @@ interface UserStore {
   isLiked: (id: string) => boolean;
 }
 
-export const useUserStore = create(
+export const useUseStore = create(
   persist<UserStore>(
     (set, get) => ({
       likedPerformanceIds: [],

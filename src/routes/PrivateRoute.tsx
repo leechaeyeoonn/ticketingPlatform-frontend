@@ -1,12 +1,12 @@
 // src/routes/PrivateRoute.tsx
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function PrivateRoute() {
-  // 1. 세션 스토리지에서 토큰 꺼내기
-  const token = sessionStorage.getItem('accessToken');
+  // ✅ Zustand Store에서 인증 상태를 직접 확인합니다.
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  // 2. 토큰이 없으면 로그인 페이지로 강제 이동 (replace: 뒤로가기 방지)
-  if (!token) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

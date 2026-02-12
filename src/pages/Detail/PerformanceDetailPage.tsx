@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchPerformanceDetail, type PerformanceDetail } from '@/api/performance';
 import { Heart } from 'lucide-react';
-import { useUserStore } from '@/store/userStore';
+import { useUseStore } from '@/store/useStore';
 
 export default function PerformanceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +14,7 @@ export default function PerformanceDetailPage() {
   const [error, setError] = useState('');
 
   // ✅ Zustand 스토어 사용
-  const { toggleLike, isLiked } = useUserStore();
+  const { toggleLike, isLiked } = useUseStore();
   const isHearted = performance ? isLiked(performance.id) : false;
 
   useEffect(() => {
